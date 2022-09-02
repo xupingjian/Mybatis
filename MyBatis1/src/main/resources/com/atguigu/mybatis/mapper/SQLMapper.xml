@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atguigu.mybatis.mapper.SQLMapper">
+<!-- select * from t_user where username like concat('%',#{username},'%') 等同于
+select * from t_user where username like '%${username}%'等同于下面的-->
+    <select id="testmohu" resultType="User">
+        select * from t_user where username like "%"#{username}"%"
+    </select>
+
+<!--    int deleteMore(@Param("ids") String ids);-->
+<!--    批量删除时不能用#{ids},这样在sql解析时会自动加一个单引号，只能用${}-->
+    <delete id="deleteMore">
+        delete from t_user where id in (#{ids})
+    </delete>
+
+<!--    List<User> getUserByTableName(@Param("tableName") String tableName);-->
+<!--    动态获取表名时只能用${}不能用#{}，因为在sql解析时会自动加一个单引号给某一个表名，在sql语句中表名不许加单引号-->
+    <select id="getUserByTableName" resultType="User">
+        select * from ${tableName}
+    </select>
+
+<!--    void insertUser(User user); 添加功能获取自增的主键-->
+<!--    useGeneratedKeys:设置当前标签的sql使用了自增的主键-->
+<!--  keyProperty：将自增的主键的值赋值给传输到映射文件中参数的某个属性  -->
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
+        insert into t_user values (null,#{username},#{password},#{age},#{sex},#{email})
+    </insert>
+</mapper>

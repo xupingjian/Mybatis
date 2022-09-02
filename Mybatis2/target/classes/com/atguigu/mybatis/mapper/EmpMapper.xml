@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atguigu.mybatis.mapper.EmpMapper">
+<!--    List<Emp> getAllEmp();
+数据库表字段名与实体类属性名不一致的解决方法：
+1：可以用sql语句起别名(将别名改成和属性名一致)的方式  select eid,emp_name empName,age,sex,email,did from t_emp
+2. 设置Mybatis的全局配置：将_自动映射为驼峰，emp_name映射成empName
+3.通过resultMap设置自定义的映射关系（其中 type设置映射关系中实体类的类型，子标签id用来设置主键字段名,result用来设置普通字段名，property对应属性名，column对应字段名）
+    <resultMap id="empResultMap" type="Emp">
+    <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+
+    </resultMap>-->
+
+
+    <resultMap id="empResultMap" type="Emp">
+    <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+
+    </resultMap>
+    <select id="getAllEmp" resultMap="empResultMap">
+        select * from t_emp
+    </select>
+    <select id="getAllEmpwe" resultType="Emp">
+        select * from t_emp
+    </select>
+<!--    处理多(员工)对一（部门）的映射关系-->
+<!--    Emp getEmpAndDept(@Param("eid") Integer eid);
+1:通过级联属性赋值的方式-->
+    <resultMap id="empResultjilianMap" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <result property="dept.did" column="did"></result>
+        <result property="dept.deptName" column="dept_name"></result>
+    </resultMap>
+    <select id="getEmpAndDept1" resultMap="empResultjilianMap">
+        select * from t_emp left join t_dept on t_emp.did=t_dept.did where t_emp.eid=#{eid}
+    </select>
+
+<!-- 2.通过association处理多对一的映射关系   -->
+<!--association:处理多对一的映射关系
+property:需要处理多对一的映射关系的属性名（是1的属性名）
+javaType:该属性名的类型-->
+    <resultMap id="empResultasMap" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <association property="dept" javaType="Dept">
+            <id property="did" column="did"></id>
+            <result property="deptName" column="dept_name"></result>
+        </association>
+    </resultMap>
+    <select id="getEmpAndDept" resultMap="empResultasMap">
+        select * from t_emp left join t_dept on t_emp.did=t_dept.did where t_emp.eid=#{eid}
+    </select>
+
+<!--    3.分步查询：先查员工再查员工部门信息-->
+<!--    Emp getEmpAndDeptByStepOne(@Param("eid") Integer eid);-->
+<!--select：设置分步查询的sql的唯一标识（namespace.SQLID）
+column:设置分步查询的条件
+fetchType当开启了全局的延迟加载之后，可通过此属性手动控制延迟加载的效果-->
+    <resultMap id="empAndDeptByStepResultMap" type="Emp">
+        <id property="eid" column="eid"></id>
+        <result property="empName" column="emp_name"></result>
+        <result property="age" column="age"></result>
+        <result property="sex" column="sex"></result>
+        <result property="email" column="email"></result>
+        <association property="dept"
+        select="com.atguigu.mybatis.mapper.DeptMapper.getEmpAndDeptByStepTwo"
+        column="did"
+        fetchType="eager"></association>
+    </resultMap>
+    <select id="getEmpAndDeptByStepOne" resultMap="empAndDeptByStepResultMap">
+        select * from t_emp where eid = #{eid}
+    </select>
+
+
+    <!--   Dept getDeptAndEmpByIdtwo(@Param("did") Integer did); -->
+    <select id="getDeptAndEmpByIdtwo" resultType="Emp">
+        select * from t_emp where did=#{did}
+    </select>
+</mapper>

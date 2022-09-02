@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atguigu.mybatis.mapper.ParameterMapper">
+    <select id="getAllUser" resultType="User">
+        select * from t_user
+    </select>
+<!--    #{}里的内容最好是属性名字，实际上写啥都可以，但最好写属性名-->
+<!--    ${}外必须手动加上单引号，如'${username}',与字符串拼接时相同需要给传入的参数加一个单引号-->
+    <select id="GetUserByUsername" resultType="User">
+        select * from t_user where username='${username}'
+    </select>
+<!--mapper接口方法的参数为多个时，此时Mybatis会将这些参数放在一个map集合里，以两种方式进行存储：
+1.以arg0,arg1为键,以要传的参数为值
+2.以param1,param为键,以要传的参数为值-->
+    <select id="checkLogin" resultType="User">
+        <!--  select * from t_user where username =#{arg0} and password = #{arg1}  -->
+        select * from t_user where username ='${arg0}' and password = '${arg1}'
+    </select>
+
+    <select id="checkLoginByMap" resultType="User">
+        <!--  select * from t_user where username =#{arg0} and password = #{arg1}  -->
+        select * from t_user where username ='${username}' and password = '${password}'
+    </select>
+
+    <insert id="insertUser">
+        insert into t_user values (null,#{username},#{password},#{age},#{sex},#{email})
+    </insert>
+
+    <select id="checkLoginByParam" resultType="User">
+        <!--  select * from t_user where username =#{arg0} and password = #{arg1}  -->
+        select * from t_user where username ='${username}' and password = '${password}'
+    </select>
+
+
+</mapper>
